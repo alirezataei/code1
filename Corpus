@@ -1,0 +1,83 @@
+public class Corpus
+	{
+		/// <summary>
+		/// الگوی عبارت منظم برای کلمات که با شماره ایجاد نمی شوند .
+		/// </summary>
+		public const string TokenPattern = @"([a-zA-Z]\w+)\W*";
+
+		private SortedDictionary<string, int> _tokens = new SortedDictionary<string, int>();
+
+
+		/// <summary>
+		/// فهرست طبقه بندی شده اند از تمام کلماتی را که نشان می دهد تا در متن، همراه با شمارش از چند بار آنها ظاهر می شود.
+		/// </summary>
+		public SortedDictionary<string, int> Tokens
+		{
+			get { return _tokens; }
+		}
+
+		/// <summary>
+		/// تابع سازنده عمومی کلاس
+		/// </summary>
+		public Corpus()
+		{
+		}
+
+		
+		public Corpus(TextReader reader)
+		{
+			LoadFromReader(reader);
+		}
+
+		
+		public Corpus(string filepath)
+		{
+			LoadFromFile(filepath);
+		}
+
+		/// <summary>
+		/// خواندن متن از فایل
+		/// </summary>
+		/// <param name="filepath"></param>
+		public void LoadFromFile(string filepath)
+		{
+			LoadFromReader(new StreamReader(filepath));
+		}
+
+		
+		public void LoadFromReader(TextReader reader)
+		{
+			Regex re = new Regex(TokenPattern, RegexOptions.Compiled);
+			string line;
+			while (null != (line = reader.ReadLine()))
+			{
+				Match m = re.Match(line);
+				while (m.Success)
+				{
+					string token = m.Groups[1].Value;
+					AddToken(token);
+					m = m.NextMatch();
+				}
+			}
+		}
+
+		/// <summary>
+		/// کلمه را با کد و مقدار تکرار آن را بر می گرداند .
+		/// </summary>
+		/// <param name="rawPhrase"></param>
+		public void AddToken(string rawPhrase)
+		{
+			if (!_tokens.ContainsKey(rawPhrase))
+			{
+				_tokens.Add(rawPhrase, 1);
+			}
+			else
+			{
+				_tokens[rawPhrase]++;
+			}
+		}
+
+
+	}
+
+}
